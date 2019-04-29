@@ -30,7 +30,7 @@
 #include <linux/fs.h>
 #include <linux/uaccess.h>
 
-#define GPIO_FOR_RX_SIGNAL	17
+#define GPIO_FOR_RX_SIGNAL	16
 #define DEV_NAME 			"rfrpi" 
 #define BUFFER_SZ			512 
 
