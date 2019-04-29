@@ -29,6 +29,8 @@
 #include <linux/time.h>
 #include <linux/fs.h>
 #include <linux/uaccess.h>
+#include <linux/wait.h>
+#include <linux/poll.h>
 
 #define GPIO_FOR_RX_SIGNAL	16
 #define DEV_NAME 			"rfrpi" 
@@ -41,6 +43,8 @@ static int  pRead;
 static int  pWrite;
 static int  wasOverflow;
 
+/* Declare wait queue for polling */
+static DECLARE_WAIT_QUEUE_HEAD(rx433_wait);
 
 /* Define GPIOs for RX signal */
 static struct gpio signals[] = {
@@ -76,6 +80,7 @@ static irqreturn_t rx_isr(int irq, void *data)
 	} else {
 		wasOverflow = 0;
 	}
+    wake_up_interruptible(&rx433_wait);
 	return IRQ_HANDLED;
 }
 
@@ -121,12 +126,22 @@ static ssize_t rx433_read(struct file *file, char __user *buf,
 	return _count;
 }
 
+static unsigned int rx433_poll(struct file *file, poll_table *wait)
+{
+    poll_wait(file, &rx433_wait, wait);
+	if ( pRead != pWrite ) {
+        return POLLIN | POLLRDNORM;
+    }
+    return 0;
+}
+
 static struct file_operations rx433_fops = {
     .owner = THIS_MODULE,
     .open = rx433_open,
     .read = rx433_read,
     .write = rx433_write,
     .release = rx433_release,
+    .poll = rx433_poll,
 };
 
 static struct miscdevice rx433_misc_device = {
