@@ -57,11 +57,11 @@ static irqreturn_t rx_isr(int irq, void *data)
 {
    	struct timespec current_time;
     struct timespec delta;
-   	unsigned long ns;
+   	unsigned long long ns;
 
    	getnstimeofday(&current_time);
 	delta = timespec_sub(current_time, lastIrq_time);
-	ns = ((long long)delta.tv_sec * 1000000)+(delta.tv_nsec/1000); 
+	ns = ((long long)delta.tv_sec * 1000000000)+(delta.tv_nsec); 
 	lastDelta[pWrite] = ns;
    	getnstimeofday(&lastIrq_time);
 
