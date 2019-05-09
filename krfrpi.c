@@ -60,7 +60,7 @@ static int rx_irqs[] = { -1 };
 static irqreturn_t rx_isr(int irq, void *data)
 {
     struct timespec current_time;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &current_time);
+    getrawmonotonic(&current_time);
 
     struct timespec delta;
     unsigned long long ns;
@@ -162,7 +162,7 @@ static int __init rfrpi_init(void)
     printk(KERN_INFO "%s\n", __func__);
 
     // INITIALIZE IRQ TIME AND Queue Management
-    clock_gettime(CLOCK_MONOTONIC_RAW, &lastIrq_time);
+    getrawmonotonic(&lastIrq_time);
     pRead = 0;
     pWrite = 0;
     wasOverflow = 0;
